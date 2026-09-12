@@ -8,6 +8,7 @@ import { useHeroMotion } from './useHeroMotion';
 import { useLensSwitcher } from './useLensSwitcher';
 import { useRiskStream } from './useRiskStream';
 import HeroLens from './HeroLens';
+import { languageOptions, useLanguage } from '../lib/language';
 
 const LEVEL_VAR: Record<string, string> = {
   LOW: 'var(--lvl-low)',
@@ -19,6 +20,7 @@ const LEVEL_VAR: Record<string, string> = {
 export default function Hero() {
   const { featured, left, right, titleFs, show } = useLensSwitcher();
   const { risk, level, offline } = useRiskStream();
+  const { language, setLanguage, t } = useLanguage();
   const skyRef = useRef<HTMLDivElement>(null);
   const canvasRefs = useRef<Record<Lens, HTMLCanvasElement | null>>({
     terrain: null, storm: null, impact: null,
@@ -96,12 +98,13 @@ export default function Hero() {
           <div className="navrow" data-open="false">
             <a className="logo" href="/">landslide<i>guard</i></a>
             <nav className="links" id="site-nav">
-              <a href="/" aria-current="page">Overview</a>
-              <a href="/about">About</a>
-              <a href="/dashboard/map">Risk Map</a>
-              <a href="/dashboard/routes">Routes</a>
-              <a href="/dashboard/alerts">Alerts</a>
-              <a className="enroll" href="/dashboard">Launch Console</a>
+              <a href="/" aria-current="page">{t('overview')}</a>
+              <a href="#about-preview">{t('about')}</a>
+              <a href="/dashboard">{t('dashboard')}</a>
+              <select className="hero-language" value={language} onChange={(event) => setLanguage(event.target.value as typeof language)} aria-label="Select language">
+                {languageOptions.map(([value, label]) => <option value={value} key={value}>{label}</option>)}
+              </select>
+              <a className="enroll" href="/dashboard/console">{t('launch')}</a>
             </nav>
             <button
               className="burger" type="button" aria-label="Open navigation"
@@ -114,25 +117,25 @@ export default function Hero() {
 
         <div className="copy">
           <div className="col eyebrow">
-            <span className="ent-mask"><span className="ent-line">LIVE LAYER</span></span>
+            <span className="ent-mask"><span className="ent-line">{t('liveLayer')}</span></span>
           </div>
           <h1 className="col title" style={{ ['--title-fs' as any]: titleFs }}>
             <span className="ent-mask">
-              <span className="ent-line">{NAMES[featured]}</span>
+              <span className="ent-line">{t(featured)}</span>
             </span>
           </h1>
           <div className="col rule"><span /></div>
           <p
             className="col lede"
-            dangerouslySetInnerHTML={{ __html: LEDE[featured] }}
+            dangerouslySetInnerHTML={{ __html: t(`lede${featured.charAt(0).toUpperCase()}${featured.slice(1)}`) }}
           />
 
           <div className="col cta">
             <HeroLens slot="l" lens={left}  onSelect={show} />
             <HeroLens slot="r" lens={right} onSelect={show} />
-            <a href="/dashboard">OPEN CONSOLE</a>
-            <span className="label label-l">{NAMES[left]}</span>
-            <span className="label label-r">{NAMES[right]}</span>
+            <a href="/dashboard/console">{t('openConsole')}</a>
+            <span className="label label-l">{t(left)}</span>
+            <span className="label label-r">{t(right)}</span>
           </div>
 
           <div
@@ -141,12 +144,12 @@ export default function Hero() {
             aria-live="polite"
           >
             <span className="dot" />
-            <span className="ticker-text">RISK {risk}% · {level}</span>
+            <span className="ticker-text">{t('riskTicker')} {risk}% · {level}</span>
           </div>
         </div>
       </div>
 
-      <button className="scroll" type="button" aria-label="Open project information" onClick={() => { window.location.href = '/about'; }}>
+      <button className="scroll" type="button" aria-label="Scroll to project information" onClick={() => document.getElementById('about-preview')?.scrollIntoView({ behavior: 'smooth' })}>
         <svg viewBox="0 0 26 33" fill="none" aria-hidden="true">
           <path
             d="M13 1.5 V31.5 M1.9 20.4 L13 31.5 L24.1 20.4"

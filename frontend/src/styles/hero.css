@@ -1,3 +1,4 @@
+.hero-language{height:calc(38 * var(--u));margin-left:calc(18 * var(--u));border:1px solid rgba(255,255,255,.25);background:rgba(7,18,35,.7);color:#fff;padding:0 calc(10 * var(--u));font:inherit;font-size:calc(13 * var(--u));cursor:pointer}.hero-language option{background:#07141d;color:#fff}
 /* ════════════ BACKDROP ════════════ */
 .stage{position:relative;width:100vw;height:100vh;height:100dvh;overflow:hidden}
 .sky{position:absolute;inset:0;z-index:0}

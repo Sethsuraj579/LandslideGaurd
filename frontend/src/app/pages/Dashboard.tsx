@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Activity, Bell, ChevronRight, CloudRain, Gauge, Map, Menu, Route, ShieldAlert, SlidersHorizontal, Waves, X } from "lucide-react";
 import { apiGet } from "../../lib/api";
+import { languageOptions, useLanguage } from "../../lib/language";
 import "../../styles/dashboard.css";
 import "../../styles/section-workspaces.css";
 
@@ -16,10 +17,11 @@ type Alerts = { results: AlertItem[] };
 const demoSummary: Summary = { data_mode: "demo", units_monitored: 12, average_risk: 64.8, by_level: { LOW: 2, WATCH: 4, WARNING: 4, CRITICAL: 2 } };
 const demoHistory: History = { results: [35, 43, 51, 64, 76].map((risk, index) => ({ id: index, unit: 1, timestamp: `2026-09-12T${10 + index}:00:00Z`, fused_risk: risk, level: risk >= 70 ? "CRITICAL" : risk >= 50 ? "WARNING" : "WATCH", velocity: 8 + index, drivers: { rainfall: 80 + index, moisture: 72 + index } })) };
 const demoAlerts: Alerts = { results: [{ id: 1, level: "CRITICAL", status: "new", message: "Rapidly increasing risk in Demo Hills District", recommended_action: "Inspect vulnerable road corridors and notify local response teams." }, { id: 2, level: "WARNING", status: "new", message: "Rainfall threshold exceeded across 4 slope units", recommended_action: "Review safe route recommendations before dispatch." }] };
-const sections: Record<string, string> = { console: "Command console", map: "Risk map", analytics: "Risk analytics", routes: "Route safety", impact: "Impact analysis", alerts: "Alerts", simulate: "Simulation" };
+const sectionKeys = ["console", "map", "analytics", "routes", "impact", "alerts", "simulate"] as const;
 const layers = ["Dynamic risk", "Susceptibility", "Rainfall", "Soil moisture", "Infrastructure"];
 
 function SectionWorkspace({ section, data, points, alerts, rainfall, setRainfall, simulated, runSimulation }: { section: string; data: Summary; points: Snapshot[]; alerts: AlertItem[]; rainfall: number; setRainfall: (value: number) => void; simulated: number | null; runSimulation: () => void }) {
+  const { t } = useLanguage();
   const cards: Record<string, { eyebrow: string; title: string; body: string; value: string; action: string }[]> = {
     analytics: [
       { eyebrow: "RISK DISTRIBUTION", title: "District signal", body: "Critical and warning units are concentrated along the eastern corridor.", value: `${data.by_level.CRITICAL + data.by_level.WARNING}`, action: "HIGH-RISK UNITS" },
@@ -38,13 +40,14 @@ function SectionWorkspace({ section, data, points, alerts, rainfall, setRainfall
     ],
     alerts: alerts.map(alert => ({ eyebrow: alert.level, title: alert.message, body: alert.recommended_action, value: alert.status.toUpperCase(), action: "ALERT STATUS" })),
   };
-  if (section === "simulate") return <section className="section-workspace simulation-workspace"><div className="workspace-copy"><p className="section-label">SCENARIO LAB</p><h2>Change the conditions. See the consequence.</h2><p>Test a rainfall surge against the current fused risk without modifying stored observations.</p></div><div className="scenario-control"><div><span>RAINFALL CHANGE</span><strong>+{rainfall}%</strong></div><input aria-label="Scenario rainfall change" type="range" min="0" max="100" value={rainfall} onChange={event => setRainfall(Number(event.target.value))} /><button className="simulate-button" onClick={runSimulation}>RUN SCENARIO <ChevronRight size={16} /></button>{simulated !== null && <p className="sim-result">Projected risk: <b>{simulated}%</b></p>}</div></section>;
+  if (section === "simulate") return <section className="section-workspace simulation-workspace"><div className="workspace-copy"><p className="section-label">{t("whatIf")}</p><h2>{t("surge")}</h2><p>{t("evolves")}</p></div><div className="scenario-control"><div><span>{t("rainfallChange")}</span><strong>+{rainfall}%</strong></div><input aria-label={t("rainfallChange")} type="range" min="0" max="100" value={rainfall} onChange={event => setRainfall(Number(event.target.value))} /><button className="simulate-button" onClick={runSimulation}>{t("runScenario")} <ChevronRight size={16} /></button>{simulated !== null && <p className="sim-result">{t("projected")}: <b>{simulated}%</b></p>}</div></section>;
   const content = cards[section] ?? cards.analytics;
-  return <section className={`section-workspace ${section}-workspace`}><div className="workspace-copy"><p className="section-label">{section === "alerts" ? "EARLY WARNING ENGINE" : "DECISION SUPPORT"}</p><h2>{sections[section]}</h2><p>{section === "analytics" ? "Read the signals behind changing risk across monitored slope units." : section === "routes" ? "Find a path that balances distance, risk, and connectivity." : "Move from hazard probability to a clear response priority."}</p></div><div className="workspace-cards">{content.map((card, index) => <article className="workspace-card" key={`${card.title}-${index}`}><p className="section-label">{card.eyebrow}</p><h3>{card.title}</h3><strong>{card.value}</strong><small>{card.action}</small><p>{card.body}</p></article>)}</div></section>;
+  return <section className={`section-workspace ${section}-workspace`}><div className="workspace-copy"><p className="section-label">{section === "alerts" ? t("activeAlerts") : "DECISION SUPPORT"}</p><h2>{t(section)}</h2><p>{t("evolves")}</p></div><div className="workspace-cards">{content.map((card, index) => <article className="workspace-card" key={`${card.title}-${index}`}><p className="section-label">{card.eyebrow}</p><h3>{card.title}</h3><strong>{card.value}</strong><small>{card.action}</small><p>{card.body}</p></article>)}</div></section>;
 }
 
 export function Dashboard() {
   const { section = "console" } = useParams();
+  const { language, setLanguage, t } = useLanguage();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [layer, setLayer] = useState("Dynamic risk");
   const [rainfall, setRainfall] = useState(30);
@@ -66,16 +69,16 @@ export function Dashboard() {
   return <div className="console-shell">
     <header className="console-topbar">
       <Link className="console-brand" to="/"><span>LANDSLIDE</span><b>GUARD</b><small>AI / NER EARLY WARNING</small></Link>
-      <div className="top-status"><span className="live-dot" /> LIVE MONITORING <em>{data.data_mode === "demo" ? "SYNTHETIC FEED" : "API CONNECTED"}</em></div>
+      <div className="top-actions"><label className="language-picker"><span>LANGUAGE</span><select value={language} onChange={(event) => setLanguage(event.target.value as typeof language)} aria-label="Select language">{languageOptions.map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select></label><div className="top-status"><span className="live-dot" /> {t("live")} <em>{data.data_mode === "demo" ? t("synthetic") : t("api")}</em></div></div>
       <button className="mobile-menu" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Toggle navigation">{mobileOpen ? <X size={20} /> : <Menu size={20} />}</button>
     </header>
     <aside className={`console-nav ${mobileOpen ? "is-open" : ""}`}>
       <div className="nav-kicker">COMMAND CENTER</div>
-      <nav>{Object.entries(sections).map(([key, label]) => <Link onClick={() => setMobileOpen(false)} className={section === key ? "active" : ""} key={key} to={`/dashboard/${key}`}><span>{key === "map" ? <Map size={17} /> : key === "analytics" ? <Activity size={17} /> : key === "routes" ? <Route size={17} /> : key === "impact" ? <ShieldAlert size={17} /> : key === "alerts" ? <Bell size={17} /> : <SlidersHorizontal size={17} />}</span>{label}<ChevronRight size={14} /></Link>)}</nav>
+      <nav>{sectionKeys.map((key) => <Link onClick={() => setMobileOpen(false)} className={section === key ? "active" : ""} key={key} to={`/dashboard/${key}`}><span>{key === "map" ? <Map size={17} /> : key === "analytics" ? <Activity size={17} /> : key === "routes" ? <Route size={17} /> : key === "impact" ? <ShieldAlert size={17} /> : key === "alerts" ? <Bell size={17} /> : <SlidersHorizontal size={17} />}</span>{t(key)}<ChevronRight size={14} /></Link>)}</nav>
       <div className="nav-footer"><span className="pulse-ring" /><div><b>System ready</b><small>Last sync 14:32 IST</small></div></div>
     </aside>
     <main className="console-main">
-      <div className="console-heading"><div><p className="section-label">NORTH EASTERN REGION / OPERATIONAL VIEW</p><h1>{sections[section] ?? "Risk map"}</h1><p className="heading-copy">Risk evolves with the environment. Watch the conditions that change the outcome.</p></div><div className="heading-date"><span>{summary.isError ? "OFFLINE DEMO MODE" : "LIVE API FEED"}</span><b>{summary.isFetching ? "SYNCING..." : "SYNCED JUST NOW"}</b></div></div>
+      <div className="console-heading"><div><p className="section-label">NORTH EASTERN REGION / OPERATIONAL VIEW</p><h1>{t(section)}</h1><p className="heading-copy">Risk evolves with the environment. Watch the conditions that change the outcome.</p></div><div className="heading-date"><span>{summary.isError ? "OFFLINE DEMO MODE" : t("api")}</span><b>{summary.isFetching ? "SYNCING..." : t("synced")}</b></div></div>
       <section className="metric-grid">
         <article className="metric-card metric-primary"><div className="metric-label"><Gauge size={16} /> FUSED RISK</div><strong>{currentRisk.toFixed(1)}<sup>%</sup></strong><span className="metric-trend up">+{trend.toFixed(1)}% / hr</span><div className="meter"><i style={{ width: `${currentRisk}%` }} /></div><small>Adaptive fusion · {currentRisk >= 70 ? "CRITICAL" : currentRisk >= 50 ? "WARNING" : "WATCH"}</small></article>
         <article className="metric-card"><div className="metric-label"><Activity size={16} /> MONITORED UNITS</div><strong>{data.units_monitored}</strong><span className="metric-sub">ACTIVE SLOPE UNITS</span><div className="mini-bars">{[32, 42, 37, 55, 48, 72, 67, 81, 76, 88].map((height, i) => <i key={i} style={{ height: `${height}%` }} />)}</div></article>
