@@ -1,0 +1,9 @@
+project: LandslideGuard AI
+region: North-Eastern Region, India
+data_mode: demo
+risk_levels:
+  low: [0, 25]
+  watch: [25, 50]
+  warning: [50, 70]
+  critical: [70, 100]
+

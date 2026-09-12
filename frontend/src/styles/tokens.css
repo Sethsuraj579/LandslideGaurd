@@ -1,0 +1,35 @@
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --dw:1353; --dh:1163; --gutter:25;
+  --u:max(min(.72px, calc(100vh / 700)), min(calc(100vw / 1353), calc(100vh / 1163)));
+  --dh-px:calc(1163 * var(--u));
+  --vshift:calc(max(0px, (100vh - var(--dh-px))) * .42);
+
+  --ink:#ffffff;
+  --cyan:#79dce8;
+  --cyan-logo:#5fd0e1;
+  --rule:rgba(255,255,255,.23);
+  --btn-ink:#071227;
+
+  --lvl-low:#3ddc97;
+  --lvl-watch:#ffd166;
+  --lvl-warning:#ff8a3d;
+  --lvl-critical:#ff4d4d;
+  --level-color:var(--lvl-watch);
+
+  --font-serif:'Prata', Georgia, serif;
+  --font-body:'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-logo:'Poppins', sans-serif;
+}
+@supports (height:100dvh){
+  :root{
+    --u:max(min(.72px, calc(100dvh / 700)), min(calc(100vw / 1353), calc(100dvh / 1163)));
+    --vshift:calc(max(0px, (100dvh - var(--dh-px))) * .42);
+  }
+}
+html,body{height:100%}
+body{background:#04101f;color:var(--ink);font-family:var(--font-body);
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  text-rendering:geometricPrecision;overflow-x:hidden;overflow-y:auto}
+  

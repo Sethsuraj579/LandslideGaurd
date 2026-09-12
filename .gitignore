@@ -1,0 +1,54 @@
+# Local secrets and environment files
+.env
+.env.*
+!.env.example
+
+# Python environments and caches
+.venv/
+backend/.venv/
+backend/venv/
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.ruff_cache/
+.tox/
+
+# Local development databases and logs
+backend/db.sqlite3
+*.sqlite3
+*.db
+*.log
+
+# Test and coverage output
+.pytest_cache/
+htmlcov/
+coverage/
+
+# Frontend dependencies and build output
+node_modules/
+frontend/dist/
+frontend/.vite/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Generated reports and browser test output
+playwright-report/
+test-results/
+
+# Generated ML artifacts
+models/*.pkl
+models/*.joblib
+
+# Notebook runtime state
+.ipynb_checkpoints/
+
+# Large raw geospatial downloads
+data/raw/**/*.tif
+data/raw/**/*.geojson
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/

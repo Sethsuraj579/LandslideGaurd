@@ -1,0 +1,13 @@
+[project]
+name = "landslideguard-ai"
+version = "0.1.0"
+description = "Landslide intelligence and early-warning platform"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "joblib>=1.4.2", "networkx>=3.3", "numpy>=1.26.4", "pandas>=2.2.2",
+  "pydantic>=2.7.1", "pyyaml>=6.0.1", "scikit-learn>=1.5.0"
+]
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+

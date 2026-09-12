@@ -1,0 +1,1 @@
+"""LandslideGuard domain applications."""

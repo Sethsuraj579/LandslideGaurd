@@ -1,0 +1,2 @@
+# Root compatibility entry point. Use `cd backend && uv sync` for normal development.
+-r backend/requirements.txt
