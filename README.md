@@ -262,3 +262,7 @@ uv run python src/models/evaluate.py --demo
 ## No Docker Requirement
 
 Docker and Docker Compose are intentionally not part of this project. Use native Python, uv, Node.js, PostgreSQL/PostGIS, GDAL, and Redis installations where those services are required.
+
+## Command Console Preview
+
+![LandslideGuard AI command console](docs/images/command-console.png)
